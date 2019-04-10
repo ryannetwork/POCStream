@@ -1,0 +1,37 @@
+
+
+val df = spark.read.format("csv").option("header", "true").option("mode", "DROPMALFORMED").option("inferSchema", true).load("C:\\tmp\\input\\THP Full Data Set_201706\\MissingFiles\\THP_Pharmacy_*.csv")
+
+df.write.mode("overwrite").format("csv").option("header","true").option("sep","|").csv("C:\\tmp\\output\\THP_Pharmacy_20170301.csv")
+
+//Drop column
+//df.drop("colA") 
+
+//https://stackoverflow.com/questions/32524044/how-to-implement-like-condition-in-sparksql
+
+df.select("MemberID").show()
+df.fiter("MemberID like CONCAT('%', 'H04010312 01', '%')").df.select("MemberID").show()
+df.createOrReplaceTempView("pharm")
+val sqlDF = spark.sql("SELECT MemberID FROM pharm where MemberID like CONCAT('%', 'H04010312 01', '%')  ")
+sqlDF.show()
+sqlDF.coalesce(1).write.mode("overwrite").format("csv").option("header","true").option("sep","|").csv(outpath)
+
+
+==================
+val ds = Seq("String,int,f1,bool1","abc,23111,23.07738,true", "abc,23111,23.07738,true",  "abc,23111,true,true").toDS()
+
+    spark.read.option("sep", ",").option("quote", "\"").option("header", true).option("inferSchema", true).csv(ds).show()
+==============
+
+
+
+val colsToRemove = Seq("selectReconcileData","dateDenied","reasonForDenil") 
+
+val filteredDF = df.select(df.columns .filter(colName => !colsToRemove.contains(colName)) .map(colName => new Column(colName)): _*) 
+
+
+
+########################	
+sc.textFile("C:\\tmp\\input\\MOA2\\MOA_004.csv").zipWithIndex().map { case (line, i) => line + "*" +  (i + 1) }.saveAsTextFile("C:\\tmp\\output\\MOA2\\MOA_004.csv")
+    
+

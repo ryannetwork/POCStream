@@ -1,0 +1,1 @@
+2017-12-19 14:57:05.875 -05:00 [Error] HomeController: Helloworld from Index
